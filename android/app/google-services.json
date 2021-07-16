@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1007097889874",
+    "project_id": "test-b503c",
+    "storage_bucket": "test-b503c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1007097889874:android:7376ba12a8bee401660b8b",
+        "android_client_info": {
+          "package_name": "com.beratmirzaloglu.blogapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1007097889874-3li85d924qgdfqqqnqohdcuino45tgni.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCPm4wi-9wxedGkrx6Iu5B63bDvKI5_WE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1007097889874-3li85d924qgdfqqqnqohdcuino45tgni.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
