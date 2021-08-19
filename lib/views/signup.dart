@@ -1,16 +1,32 @@
-import 'package:blogapp/constants/asset_path.dart';
-import 'package:blogapp/controllers/authController.dart';
-import 'package:blogapp/pages/login/login.dart';
-import 'package:blogapp/widgets/static-functions.dart';
+// Dart imports:
+import 'dart:io';
+
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:get/get.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart';
 
-class SignupPage extends StatelessWidget {
+// Project imports:
+import 'package:blogapp/controllers/authController.dart';
+import 'package:blogapp/utils/static-functions.dart';
+
+class SignUpView extends StatefulWidget {
+  @override
+  _SignUpViewState createState() => _SignUpViewState();
+}
+
+class _SignUpViewState extends State<SignUpView> {
   final AuthController _authController = Get.find<AuthController>();
+
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  File? _profilePictureFile;
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +96,39 @@ class SignupPage extends StatelessWidget {
                   ),
                 ),
               ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.05,
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.red[900],
+                ),
+                onPressed: _showChoiceDialog,
+                child: Text('Upload Profile Picture'),
+              ),
+              SizedBox(
+                height: 15,
+              ),
+              Row(
+                children: [
+                  Text(
+                    _profilePictureFile == null
+                        ? 'No image'
+                        : basename(_profilePictureFile!.path),
+                  ),
+                  Visibility(
+                    visible: _profilePictureFile != null,
+                    child: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _profilePictureFile = null;
+                        });
+                      },
+                      child: Text('X'),
+                    ),
+                  ),
+                ],
+              ),
               Container(
                 padding: EdgeInsets.only(top: 15),
                 alignment: Alignment.bottomRight,
@@ -93,10 +142,7 @@ class SignupPage extends StatelessWidget {
                 height: 20,
               ),
               MaterialButton(
-                onPressed: () => _signUpButtonClickHandler(
-                    _fullNameController.text,
-                    _emailController.text,
-                    _passwordController.text),
+                onPressed: _signUpButtonClickHandler,
                 color: Colors.red[600],
                 minWidth: double.maxFinite,
                 shape: RoundedRectangleBorder(
@@ -132,16 +178,109 @@ class SignupPage extends StatelessWidget {
     );
   }
 
-  void _navigateToLoginPage() {
-    Get.to(LoginPage());
+  void _openCamera() async {
+    try {
+      final pickedFile = await ImagePicker().pickImage(
+        source: ImageSource.camera,
+      );
+      setState(() {
+        if (pickedFile != null) {
+          _profilePictureFile = File(pickedFile.path);
+        }
+      });
+      print(pickedFile);
+    } catch (e) {
+      StaticFunctions.showError(
+          'Kamera açılamadı. Lütfen gerekli izinleri kontrol edin.');
+    }
   }
 
-  void _signUpButtonClickHandler(
-      String fullName, String email, String password) {
-    if (!GetUtils.isEmail(email)) {
+  void _openGallery() async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+    );
+    setState(() {
+      if (pickedFile != null) {
+        _profilePictureFile = File(pickedFile.path);
+      }
+    });
+  }
+
+  void _showChoiceDialog() async {
+    await Get.defaultDialog(
+      title: 'Source',
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: [
+            Divider(
+              height: 1,
+              color: Colors.blue,
+            ),
+            ListTile(
+              onTap: () {
+                _openGallery();
+                Get.back();
+              },
+              title: Text("Gallery"),
+              leading: Icon(
+                Icons.account_box,
+                color: Colors.blue,
+              ),
+            ),
+            Divider(
+              height: 1,
+              color: Colors.blue,
+            ),
+            ListTile(
+              onTap: () async {
+                _openCamera();
+                Get.back();
+              },
+              title: Text("Camera"),
+              leading: Icon(
+                Icons.camera,
+                color: Colors.blue,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToLoginPage() {
+    // Get.to(() => LoginView());
+    Get.toNamed('/login');
+  }
+
+  bool validate() {
+    if (!_emailController.text.isEmail) {
       StaticFunctions.showError('Please enter a valid email adress.');
-      return;
+      return false;
     }
-    _authController.createUser(fullName, email, password);
+
+    if (_fullNameController.text.isEmpty) {
+      StaticFunctions.showError('Please enter a valid full name.');
+      return false;
+    }
+
+    if (_passwordController.text.isEmpty) {
+      StaticFunctions.showError('Please enter a valid password.');
+      return false;
+    }
+
+    if (_passwordController.text.length < 6) {
+      StaticFunctions.showError('Password can\'t be less than 6 characters.');
+      return false;
+    }
+
+    return true;
+  }
+
+  void _signUpButtonClickHandler() {
+    if (validate()) {
+      _authController.createUser(_fullNameController.text,
+          _emailController.text, _passwordController.text, _profilePictureFile);
+    }
   }
 }

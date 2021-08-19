@@ -1,12 +1,16 @@
-import 'package:blogapp/constants/asset_path.dart';
-import 'package:blogapp/controllers/authController.dart';
-import 'package:blogapp/pages/signup/signup.dart';
-import 'package:blogapp/widgets/static-functions.dart';
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:get/get.dart';
 import 'package:hexcolor/hexcolor.dart';
 
-class LoginPage extends StatelessWidget {
+// Project imports:
+import 'package:blogapp/constants/asset_path.dart';
+import 'package:blogapp/controllers/authController.dart';
+import 'package:blogapp/utils/static-functions.dart';
+
+class LoginView extends StatelessWidget {
   final AuthController _authController = Get.find<AuthController>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -179,20 +183,18 @@ class LoginPage extends StatelessWidget {
       StaticFunctions.showError('Please enter a valid email adress.');
       return;
     }
-    _authController.login('beratmirzaloglu@gmail.com', '1234561');
+    _authController.login(email, password);
   }
 
   void _twitterLoginButtonClickHandler() {
-    // TODO: Twitter Login
     print('twitter login button clicked!');
   }
 
   void _facebookLoginButtonClickHandler() {
-    // TODO: Facebook Login
     print('facebook login button clicked!');
   }
 
   void _signUpButtonClickHandler() {
-    Get.to(SignupPage());
+    Get.toNamed('/signup');
   }
 }
